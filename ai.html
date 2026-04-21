@@ -1,0 +1,1326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sports Skill Arcade</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: linear-gradient(to bottom, #dbeafe, #f8fafc);
+      color: #0f172a;
+      text-align: center;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 24px 16px 40px;
+    }
+
+    h1 {
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      font-size: 18px;
+      margin-bottom: 20px;
+    }
+
+    .panel {
+      background: white;
+      border-radius: 18px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+      padding: 18px;
+      margin-bottom: 18px;
+    }
+
+    .sport-tabs,
+    .difficulty-tabs {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+
+    .tab-btn,
+    .difficulty-btn,
+    .control-btn {
+      border: none;
+      border-radius: 12px;
+      padding: 12px 18px;
+      font-size: 15px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    .tab-btn,
+    .difficulty-btn {
+      background: #e2e8f0;
+      color: #0f172a;
+    }
+
+    .tab-btn.active,
+    .difficulty-btn.active {
+      background: #1d4ed8;
+      color: white;
+    }
+
+    .control-btn {
+      background: #1d4ed8;
+      color: white;
+      margin: 6px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+    }
+
+    .control-btn:hover,
+    .tab-btn:hover,
+    .difficulty-btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .control-btn:disabled {
+      background: #94a3b8;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .scoreboard {
+      display: flex;
+      justify-content: center;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+    }
+
+    .score-box {
+      background: white;
+      border-radius: 14px;
+      padding: 14px 18px;
+      min-width: 150px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+    }
+
+    .score-box h3 {
+      margin: 0 0 8px;
+      font-size: 17px;
+    }
+
+    .score-box p {
+      margin: 0;
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    .meter-wrap {
+      max-width: 560px;
+      margin: 0 auto 18px;
+    }
+
+    .meter-label {
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+
+    .meter {
+      width: 100%;
+      height: 28px;
+      border-radius: 999px;
+      position: relative;
+      overflow: hidden;
+      border: 2px solid #334155;
+      background: linear-gradient(to right, #ef4444 0%, #f59e0b 20%, #22c55e 50%, #f59e0b 80%, #ef4444 100%);
+      box-shadow: inset 0 2px 8px rgba(0,0,0,0.15);
+    }
+
+    .meter-target {
+      position: absolute;
+      top: 0;
+      height: 100%;
+      background: rgba(255,255,255,0.28);
+      border-left: 3px solid white;
+      border-right: 3px solid white;
+    }
+
+    .meter-marker {
+      position: absolute;
+      top: -3px;
+      width: 8px;
+      height: 34px;
+      background: #0f172a;
+      border-radius: 4px;
+      left: 0%;
+      z-index: 2;
+    }
+
+    .game-area {
+      width: 100%;
+      max-width: 960px;
+      height: 540px;
+      margin: 0 auto 18px;
+      position: relative;
+      overflow: hidden;
+      border-radius: 22px;
+      border: 6px solid #7c4a1f;
+      box-shadow: 0 10px 24px rgba(0,0,0,0.14);
+      background: linear-gradient(to bottom, #93c5fd 0%, #dbeafe 45%, #86efac 45%, #4ade80 100%);
+    }
+
+    .message {
+      font-size: 22px;
+      font-weight: bold;
+      min-height: 32px;
+      margin-top: 10px;
+    }
+
+    .instructions {
+      line-height: 1.6;
+      max-width: 860px;
+      margin: 0 auto;
+    }
+
+    .nav-link {
+      display: inline-block;
+      margin-top: 16px;
+      text-decoration: none;
+      color: #1d4ed8;
+      font-weight: bold;
+    }
+
+    .nav-link:hover {
+      text-decoration: underline;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* shared objects */
+    .ball,
+    .soccer-ball,
+    .baseball,
+    .football {
+      position: absolute;
+      z-index: 9;
+    }
+
+    .ball {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, #fb923c, #d97706 65%, #92400e 100%);
+      border: 2px solid #7c2d12;
+      box-shadow: inset -3px -3px 6px rgba(0,0,0,0.15);
+    }
+
+    .ball::before,
+    .ball::after {
+      content: "";
+      position: absolute;
+      background: #7c2d12;
+    }
+
+    .ball::before {
+      width: 2px;
+      height: 100%;
+      left: 15px;
+      top: 0;
+    }
+
+    .ball::after {
+      width: 100%;
+      height: 2px;
+      top: 15px;
+      left: 0;
+    }
+
+    .soccer-ball {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, white, #e5e7eb 70%);
+      border: 2px solid #111827;
+    }
+
+    .baseball {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: white;
+      border: 2px solid #d1d5db;
+      box-shadow: inset -2px -2px 4px rgba(0,0,0,0.08);
+    }
+
+    .football {
+      width: 44px;
+      height: 26px;
+      border-radius: 50%;
+      background: linear-gradient(to right, #92400e, #7c2d12);
+      border: 2px solid #5b2b0b;
+      transform: rotate(-20deg);
+    }
+
+    .football::before {
+      content: "";
+      position: absolute;
+      left: 18px;
+      top: 4px;
+      width: 6px;
+      height: 14px;
+      background: white;
+      border-radius: 3px;
+    }
+
+    .football::after {
+      content: "";
+      position: absolute;
+      left: 14px;
+      top: 10px;
+      width: 14px;
+      height: 2px;
+      background: white;
+      box-shadow: 0 -4px 0 white, 0 4px 0 white;
+    }
+
+    /* basketball scene */
+    .basketball-scene .crowd {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 170px;
+      height: 70px;
+      background:
+        radial-gradient(circle at 20px 30px, #1f2937 0 8px, transparent 9px),
+        radial-gradient(circle at 60px 25px, #334155 0 8px, transparent 9px),
+        radial-gradient(circle at 100px 35px, #111827 0 8px, transparent 9px),
+        radial-gradient(circle at 140px 28px, #475569 0 8px, transparent 9px);
+      background-size: 160px 70px;
+      opacity: 0.65;
+    }
+
+    .basketball-scene .court-floor {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 250px;
+      background: linear-gradient(to bottom, #d68b3e, #be6a22);
+    }
+
+    .basketball-scene .three-point-line {
+      position: absolute;
+      width: 560px;
+      height: 560px;
+      border: 5px solid rgba(255,255,255,0.7);
+      border-radius: 50%;
+      bottom: -300px;
+      left: 80px;
+    }
+
+    .basketball-scene .paint {
+      position: absolute;
+      right: 110px;
+      bottom: 0;
+      width: 180px;
+      height: 190px;
+      border: 4px solid rgba(255,255,255,0.75);
+      border-bottom: none;
+      background: rgba(255,255,255,0.04);
+    }
+
+    .basketball-scene .free-throw-circle {
+      position: absolute;
+      right: 150px;
+      bottom: 105px;
+      width: 90px;
+      height: 90px;
+      border: 4px solid rgba(255,255,255,0.75);
+      border-radius: 50%;
+    }
+
+    .basketball-scene .backboard {
+      position: absolute;
+      top: 120px;
+      right: 135px;
+      width: 18px;
+      height: 110px;
+      background: #f8fafc;
+      border: 2px solid #cbd5e1;
+      z-index: 4;
+    }
+
+    .basketball-scene .rim {
+      position: absolute;
+      top: 170px;
+      right: 150px;
+      width: 90px;
+      height: 10px;
+      background: linear-gradient(to bottom, #ef4444, #b91c1c);
+      border-radius: 4px;
+      z-index: 5;
+    }
+
+    .basketball-scene .net {
+      position: absolute;
+      top: 180px;
+      right: 160px;
+      width: 70px;
+      height: 52px;
+      z-index: 4;
+      pointer-events: none;
+    }
+
+    .basketball-scene .net svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    .basketball-scene .shooter {
+      position: absolute;
+      left: 125px;
+      bottom: 85px;
+      width: 90px;
+      height: 150px;
+      z-index: 3;
+    }
+
+    .head {
+      position: absolute;
+      top: 0;
+      left: 28px;
+      width: 34px;
+      height: 34px;
+      background: #f1c27d;
+      border-radius: 50%;
+      border: 2px solid #8b5e3c;
+    }
+
+    .body {
+      position: absolute;
+      top: 34px;
+      left: 22px;
+      width: 46px;
+      height: 56px;
+      background: #1d4ed8;
+      border-radius: 10px;
+    }
+
+    .arm-left,
+    .arm-right,
+    .leg-left,
+    .leg-right {
+      position: absolute;
+      background: #8b5e3c;
+      border-radius: 8px;
+    }
+
+    .arm-left {
+      top: 42px;
+      left: 8px;
+      width: 18px;
+      height: 52px;
+      transform: rotate(25deg);
+    }
+
+    .arm-right {
+      top: 34px;
+      left: 64px;
+      width: 16px;
+      height: 60px;
+      transform: rotate(-40deg);
+    }
+
+    .leg-left {
+      top: 86px;
+      left: 24px;
+      width: 16px;
+      height: 58px;
+      transform: rotate(8deg);
+    }
+
+    .leg-right {
+      top: 86px;
+      left: 50px;
+      width: 16px;
+      height: 58px;
+      transform: rotate(-8deg);
+    }
+
+    /* football scene */
+    .football-scene .field {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to bottom, #7dd3fc 0%, #c7f9ff 35%, #4ade80 35%, #15803d 100%);
+    }
+
+    .football-scene .yard-lines {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 290px;
+      background:
+        repeating-linear-gradient(to right, transparent 0 88px, rgba(255,255,255,0.65) 88px 92px);
+    }
+
+    .football-scene .hash-left,
+    .football-scene .hash-right {
+      position: absolute;
+      bottom: 110px;
+      width: 100%;
+      height: 8px;
+      background:
+        repeating-linear-gradient(to right, transparent 0 38px, rgba(255,255,255,0.75) 38px 50px);
+    }
+
+    .football-scene .hash-left { bottom: 160px; }
+    .football-scene .hash-right { bottom: 120px; }
+
+    .football-scene .goalpost {
+      position: absolute;
+      top: 70px;
+      left: 50%;
+      width: 10px;
+      height: 240px;
+      background: #facc15;
+      transform: translateX(-50%);
+      z-index: 4;
+    }
+
+    .football-scene .crossbar {
+      position: absolute;
+      top: 150px;
+      left: calc(50% - 110px);
+      width: 220px;
+      height: 10px;
+      background: #facc15;
+      z-index: 4;
+    }
+
+    .football-scene .upright-left,
+    .football-scene .upright-right {
+      position: absolute;
+      top: 65px;
+      width: 10px;
+      height: 95px;
+      background: #facc15;
+      z-index: 4;
+    }
+
+    .football-scene .upright-left { left: calc(50% - 110px); }
+    .football-scene .upright-right { left: calc(50% + 100px); }
+
+    .football-scene .kicker {
+      position: absolute;
+      left: 450px;
+      bottom: 80px;
+      width: 60px;
+      height: 110px;
+      z-index: 3;
+    }
+
+    .football-scene .kicker .head { left: 14px; width: 30px; height: 30px; }
+    .football-scene .kicker .body { left: 10px; width: 36px; height: 44px; background: #dc2626; }
+    .football-scene .kicker .leg-left { left: 12px; top: 72px; height: 40px; width: 12px; }
+    .football-scene .kicker .leg-right { left: 32px; top: 70px; height: 42px; width: 12px; transform: rotate(-25deg); }
+
+    /* soccer scene */
+    .soccer-scene {
+      background: linear-gradient(to bottom, #93c5fd 0%, #dbeafe 38%, #86efac 38%, #16a34a 100%);
+    }
+
+    .soccer-scene .pitch-lines {
+      position: absolute;
+      left: 40px;
+      right: 40px;
+      top: 200px;
+      bottom: 30px;
+      border: 4px solid rgba(255,255,255,0.7);
+    }
+
+    .soccer-scene .goal {
+      position: absolute;
+      top: 120px;
+      left: 50%;
+      width: 300px;
+      height: 140px;
+      transform: translateX(-50%);
+      border: 8px solid white;
+      border-bottom: 0;
+      z-index: 4;
+    }
+
+    .soccer-scene .goal-net {
+      position: absolute;
+      top: 128px;
+      left: 50%;
+      width: 284px;
+      height: 128px;
+      transform: translateX(-50%);
+      background:
+        repeating-linear-gradient(to right, rgba(255,255,255,0.5) 0 2px, transparent 2px 24px),
+        repeating-linear-gradient(to bottom, rgba(255,255,255,0.5) 0 2px, transparent 2px 22px);
+      z-index: 3;
+    }
+
+    .soccer-scene .goalie {
+      position: absolute;
+      top: 165px;
+      left: 50%;
+      width: 50px;
+      height: 80px;
+      transform: translateX(-50%);
+      z-index: 6;
+      transition: left 0.15s linear;
+    }
+
+    .soccer-scene .goalie .head {
+      width: 24px;
+      height: 24px;
+      left: 13px;
+      top: 0;
+    }
+
+    .soccer-scene .goalie .body {
+      width: 32px;
+      height: 36px;
+      left: 9px;
+      top: 24px;
+      background: #111827;
+    }
+
+    .soccer-scene .goalie .arm-left,
+    .soccer-scene .goalie .arm-right {
+      top: 28px;
+      width: 10px;
+      height: 34px;
+      background: #8b5e3c;
+    }
+
+    .soccer-scene .goalie .arm-left { left: -2px; transform: rotate(30deg); }
+    .soccer-scene .goalie .arm-right { left: 42px; transform: rotate(-30deg); }
+
+    .soccer-scene .goalie .leg-left,
+    .soccer-scene .goalie .leg-right {
+      width: 10px;
+      height: 26px;
+      top: 58px;
+    }
+
+    .soccer-scene .goalie .leg-left { left: 10px; }
+    .soccer-scene .goalie .leg-right { left: 28px; }
+
+    .soccer-scene .kicker {
+      position: absolute;
+      left: 460px;
+      bottom: 75px;
+      width: 70px;
+      height: 120px;
+      z-index: 4;
+    }
+
+    .soccer-scene .kicker .body { background: #16a34a; }
+
+    /* baseball scene */
+    .baseball-scene {
+      background: linear-gradient(to bottom, #93c5fd 0%, #dbeafe 35%, #86efac 35%, #15803d 100%);
+    }
+
+    .baseball-scene .infield {
+      position: absolute;
+      width: 320px;
+      height: 320px;
+      background: #b45309;
+      left: 50%;
+      bottom: -120px;
+      transform: translateX(-50%) rotate(45deg);
+      border: 4px solid rgba(255,255,255,0.7);
+    }
+
+    .baseball-scene .outfield-arc {
+      position: absolute;
+      width: 750px;
+      height: 420px;
+      border: 5px solid rgba(255,255,255,0.75);
+      border-bottom: none;
+      border-radius: 380px 380px 0 0;
+      left: 50%;
+      bottom: 25px;
+      transform: translateX(-50%);
+    }
+
+    .baseball-scene .plate {
+      position: absolute;
+      left: 50%;
+      bottom: 120px;
+      width: 24px;
+      height: 20px;
+      background: white;
+      transform: translateX(-50%);
+      clip-path: polygon(0 0, 100% 0, 100% 65%, 50% 100%, 0 65%);
+      z-index: 5;
+    }
+
+    .baseball-scene .pitcher-mound {
+      position: absolute;
+      left: 50%;
+      top: 260px;
+      width: 90px;
+      height: 50px;
+      background: #d4a373;
+      border-radius: 50%;
+      transform: translateX(-50%);
+    }
+
+    .baseball-scene .batter {
+      position: absolute;
+      left: 430px;
+      bottom: 92px;
+      width: 90px;
+      height: 130px;
+      z-index: 6;
+    }
+
+    .baseball-scene .batter .body {
+      background: #1d4ed8;
+    }
+
+    .bat {
+      position: absolute;
+      left: 56px;
+      top: 24px;
+      width: 12px;
+      height: 80px;
+      background: linear-gradient(to bottom, #f5deb3, #d4a373);
+      border-radius: 8px;
+      transform: rotate(-35deg);
+      transform-origin: bottom center;
+    }
+
+    .crowd-strip {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 170px;
+      height: 55px;
+      background:
+        radial-gradient(circle at 20px 30px, #1f2937 0 7px, transparent 8px),
+        radial-gradient(circle at 55px 25px, #334155 0 7px, transparent 8px),
+        radial-gradient(circle at 90px 30px, #111827 0 7px, transparent 8px);
+      background-size: 110px 55px;
+      opacity: 0.6;
+    }
+
+    @media (max-width: 900px) {
+      .game-area {
+        height: 500px;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .game-area {
+        height: 460px;
+      }
+      .score-box {
+        min-width: 130px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Sports Skill Arcade</h1>
+    <p class="subtitle">Play basketball, football, soccer, and baseball in one skill-based sports game.</p>
+
+    <div class="panel">
+      <div class="sport-tabs">
+        <button class="tab-btn active" data-sport="basketball">Basketball</button>
+        <button class="tab-btn" data-sport="football">Field Goal</button>
+        <button class="tab-btn" data-sport="soccer">Penalty Kick</button>
+        <button class="tab-btn" data-sport="baseball">Home Run Derby</button>
+      </div>
+
+      <div class="difficulty-tabs">
+        <button class="difficulty-btn active" data-difficulty="easy">Easy</button>
+        <button class="difficulty-btn" data-difficulty="medium">Medium</button>
+        <button class="difficulty-btn" data-difficulty="hard">Hard</button>
+      </div>
+
+      <div class="instructions" id="instructions">
+        Press Start Play, then release in the green zone. Each sport has its own skill mechanic and target.
+      </div>
+    </div>
+
+    <div class="scoreboard">
+      <div class="score-box">
+        <h3>Score</h3>
+        <p id="score">0</p>
+      </div>
+      <div class="score-box">
+        <h3>Attempts</h3>
+        <p id="attempts">0 / 10</p>
+      </div>
+      <div class="score-box">
+        <h3>Best</h3>
+        <p id="best">0</p>
+      </div>
+      <div class="score-box">
+        <h3>Mode</h3>
+        <p id="modeLabel">Basketball</p>
+      </div>
+    </div>
+
+    <div class="meter-wrap">
+      <div class="meter-label">Skill Meter</div>
+      <div class="meter">
+        <div class="meter-target" id="meterTarget"></div>
+        <div class="meter-marker" id="meterMarker"></div>
+      </div>
+    </div>
+
+    <div class="game-area" id="gameArea">
+      <!-- basketball -->
+      <div class="scene basketball-scene" id="basketballScene">
+        <div class="crowd"></div>
+        <div class="court-floor"></div>
+        <div class="three-point-line"></div>
+        <div class="paint"></div>
+        <div class="free-throw-circle"></div>
+        <div class="backboard"></div>
+        <div class="rim"></div>
+        <div class="net" id="basketballNet">
+          <svg viewBox="0 0 100 80" preserveAspectRatio="none">
+            <line x1="5" y1="0" x2="20" y2="75" stroke="white" stroke-width="2"/>
+            <line x1="20" y1="0" x2="32" y2="75" stroke="white" stroke-width="2"/>
+            <line x1="35" y1="0" x2="44" y2="75" stroke="white" stroke-width="2"/>
+            <line x1="50" y1="0" x2="50" y2="75" stroke="white" stroke-width="2"/>
+            <line x1="65" y1="0" x2="56" y2="75" stroke="white" stroke-width="2"/>
+            <line x1="80" y1="0" x2="68" y2="75" stroke="white" stroke-width="2"/>
+            <line x1="95" y1="0" x2="80" y2="75" stroke="white" stroke-width="2"/>
+            <line x1="10" y1="18" x2="90" y2="18" stroke="white" stroke-width="2"/>
+            <line x1="14" y1="36" x2="86" y2="36" stroke="white" stroke-width="2"/>
+            <line x1="20" y1="56" x2="80" y2="56" stroke="white" stroke-width="2"/>
+          </svg>
+        </div>
+        <div class="shooter">
+          <div class="head"></div>
+          <div class="body"></div>
+          <div class="arm-left"></div>
+          <div class="arm-right"></div>
+          <div class="leg-left"></div>
+          <div class="leg-right"></div>
+        </div>
+        <div class="ball" id="basketballBall"></div>
+      </div>
+
+      <!-- football -->
+      <div class="scene football-scene hidden" id="footballScene">
+        <div class="field"></div>
+        <div class="yard-lines"></div>
+        <div class="hash-left"></div>
+        <div class="hash-right"></div>
+        <div class="goalpost"></div>
+        <div class="crossbar"></div>
+        <div class="upright-left"></div>
+        <div class="upright-right"></div>
+        <div class="kicker">
+          <div class="head"></div>
+          <div class="body"></div>
+          <div class="leg-left"></div>
+          <div class="leg-right"></div>
+        </div>
+        <div class="football" id="footballBall"></div>
+      </div>
+
+      <!-- soccer -->
+      <div class="scene soccer-scene hidden" id="soccerScene">
+        <div class="pitch-lines"></div>
+        <div class="goal"></div>
+        <div class="goal-net"></div>
+        <div class="goalie" id="goalie">
+          <div class="head"></div>
+          <div class="body"></div>
+          <div class="arm-left"></div>
+          <div class="arm-right"></div>
+          <div class="leg-left"></div>
+          <div class="leg-right"></div>
+        </div>
+        <div class="kicker">
+          <div class="head"></div>
+          <div class="body"></div>
+          <div class="arm-left"></div>
+          <div class="arm-right"></div>
+          <div class="leg-left"></div>
+          <div class="leg-right"></div>
+        </div>
+        <div class="soccer-ball" id="soccerBall"></div>
+      </div>
+
+      <!-- baseball -->
+      <div class="scene baseball-scene hidden" id="baseballScene">
+        <div class="crowd-strip"></div>
+        <div class="outfield-arc"></div>
+        <div class="infield"></div>
+        <div class="pitcher-mound"></div>
+        <div class="plate"></div>
+        <div class="batter">
+          <div class="head"></div>
+          <div class="body"></div>
+          <div class="arm-left"></div>
+          <div class="arm-right"></div>
+          <div class="leg-left"></div>
+          <div class="leg-right"></div>
+          <div class="bat"></div>
+        </div>
+        <div class="baseball" id="baseballBall"></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <button class="control-btn" id="startBtn">Start Play</button>
+      <button class="control-btn" id="actionBtn" disabled>Shoot / Kick / Swing</button>
+      <button class="control-btn" id="resetBtn">Reset Mode</button>
+      <div class="message" id="message">Pick a sport and release in the green zone.</div>
+    </div>
+
+    <a class="nav-link" href="fromScratch.html">Back to From Scratch Page</a>
+  </div>
+
+  <script>
+    const state = {
+      sport: "basketball",
+      difficulty: "easy",
+      score: 0,
+      attempts: 0,
+      bests: {
+        basketball: 0,
+        football: 0,
+        soccer: 0,
+        baseball: 0
+      },
+      meterValue: 0,
+      meterDirection: 1,
+      meterInterval: null,
+      meterRunning: false,
+      animating: false,
+      goalieInterval: null,
+      goalieDirection: 1,
+      goalieX: 50
+    };
+
+    const config = {
+      easy:   { targetStart: 40, targetWidth: 20, speed: 1.7, goalieSpeed: 1.2 },
+      medium: { targetStart: 43, targetWidth: 14, speed: 2.3, goalieSpeed: 2.0 },
+      hard:   { targetStart: 45, targetWidth: 10, speed: 3.0, goalieSpeed: 3.0 }
+    };
+
+    const instructionsBySport = {
+      basketball: "Basketball: release in the green zone for a swish. Slight misses hit rim. Bigger misses sail left or right.",
+      football: "Field Goal: time the kick so the ball goes straight through the uprights. Bad timing hooks the kick wide.",
+      soccer: "Penalty Kick: release in the target zone while the goalie moves. Better timing places the ball in the corner away from the keeper.",
+      baseball: "Home Run Derby: time your swing perfectly to launch a home run. Early or late swings become weak contact or a miss."
+    };
+
+    const scoreDisplay = document.getElementById("score");
+    const attemptsDisplay = document.getElementById("attempts");
+    const bestDisplay = document.getElementById("best");
+    const messageDisplay = document.getElementById("message");
+    const meterMarker = document.getElementById("meterMarker");
+    const meterTarget = document.getElementById("meterTarget");
+    const modeLabel = document.getElementById("modeLabel");
+    const instructions = document.getElementById("instructions");
+
+    const startBtn = document.getElementById("startBtn");
+    const actionBtn = document.getElementById("actionBtn");
+    const resetBtn = document.getElementById("resetBtn");
+
+    const basketballScene = document.getElementById("basketballScene");
+    const footballScene = document.getElementById("footballScene");
+    const soccerScene = document.getElementById("soccerScene");
+    const baseballScene = document.getElementById("baseballScene");
+
+    const basketballBall = document.getElementById("basketballBall");
+    const footballBall = document.getElementById("footballBall");
+    const soccerBall = document.getElementById("soccerBall");
+    const baseballBall = document.getElementById("baseballBall");
+    const basketballNet = document.getElementById("basketballNet");
+    const goalie = document.getElementById("goalie");
+
+    const sportButtons = document.querySelectorAll(".tab-btn");
+    const difficultyButtons = document.querySelectorAll(".difficulty-btn");
+
+    function updateHUD() {
+      scoreDisplay.textContent = state.score;
+      attemptsDisplay.textContent = `${state.attempts} / 10`;
+      bestDisplay.textContent = state.bests[state.sport];
+      modeLabel.textContent =
+        state.sport === "basketball" ? "Basketball" :
+        state.sport === "football" ? "Field Goal" :
+        state.sport === "soccer" ? "Penalty Kick" : "Home Run Derby";
+      instructions.textContent = instructionsBySport[state.sport];
+      messageDisplay.textContent = "Start the play and release in the green zone.";
+    }
+
+    function updateTargetZone() {
+      const diff = config[state.difficulty];
+      meterTarget.style.left = diff.targetStart + "%";
+      meterTarget.style.width = diff.targetWidth + "%";
+    }
+
+    function updateActiveButtons() {
+      sportButtons.forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.sport === state.sport);
+      });
+      difficultyButtons.forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.difficulty === state.difficulty);
+      });
+    }
+
+    function showScene() {
+      basketballScene.classList.add("hidden");
+      footballScene.classList.add("hidden");
+      soccerScene.classList.add("hidden");
+      baseballScene.classList.add("hidden");
+
+      if (state.sport === "basketball") basketballScene.classList.remove("hidden");
+      if (state.sport === "football") footballScene.classList.remove("hidden");
+      if (state.sport === "soccer") soccerScene.classList.remove("hidden");
+      if (state.sport === "baseball") baseballScene.classList.remove("hidden");
+    }
+
+    function stopMeter() {
+      clearInterval(state.meterInterval);
+      state.meterInterval = null;
+      state.meterRunning = false;
+      actionBtn.disabled = true;
+      startBtn.disabled = false;
+    }
+
+    function startMeter() {
+      if (state.meterRunning || state.animating || state.attempts >= 10) {
+        if (state.attempts >= 10) {
+          messageDisplay.textContent = "Mode finished. Press Reset Mode or switch sports.";
+        }
+        return;
+      }
+
+      state.meterRunning = true;
+      startBtn.disabled = true;
+      actionBtn.disabled = false;
+      messageDisplay.textContent = "Now release in the green zone.";
+
+      if (state.sport === "soccer") startGoalie();
+
+      state.meterInterval = setInterval(() => {
+        state.meterValue += state.meterDirection * config[state.difficulty].speed;
+
+        if (state.meterValue >= 100) {
+          state.meterValue = 100;
+          state.meterDirection = -1;
+        } else if (state.meterValue <= 0) {
+          state.meterValue = 0;
+          state.meterDirection = 1;
+        }
+
+        meterMarker.style.left = `calc(${state.meterValue}% - 4px)`;
+      }, 16);
+    }
+
+    function startGoalie() {
+      stopGoalie();
+      state.goalieInterval = setInterval(() => {
+        state.goalieX += state.goalieDirection * config[state.difficulty].goalieSpeed;
+        if (state.goalieX >= 62) {
+          state.goalieX = 62;
+          state.goalieDirection = -1;
+        }
+        if (state.goalieX <= 38) {
+          state.goalieX = 38;
+          state.goalieDirection = 1;
+        }
+        goalie.style.left = state.goalieX + "%";
+      }, 16);
+    }
+
+    function stopGoalie() {
+      clearInterval(state.goalieInterval);
+      state.goalieInterval = null;
+    }
+
+    function accuracyFromCenter() {
+      return Math.abs(state.meterValue - 50);
+    }
+
+    function animateArc(element, startX, startY, endX, endY, peakHeight, duration, callback) {
+      const startTime = performance.now();
+      function frame(now) {
+        const t = Math.min((now - startTime) / duration, 1);
+        const x = startX + (endX - startX) * t;
+        const linearY = startY + (endY - startY) * t;
+        const arc = 4 * peakHeight * t * (1 - t);
+        const y = linearY + arc;
+
+        element.style.left = `${x}px`;
+        element.style.bottom = `${y}px`;
+
+        if (t < 1) {
+          requestAnimationFrame(frame);
+        } else {
+          callback();
+        }
+      }
+      requestAnimationFrame(frame);
+    }
+
+    function resetObjects() {
+      basketballBall.style.left = "182px";
+      basketballBall.style.bottom = "145px";
+
+      footballBall.style.left = "470px";
+      footballBall.style.bottom = "105px";
+
+      soccerBall.style.left = "482px";
+      soccerBall.style.bottom = "100px";
+
+      baseballBall.style.left = "480px";
+      baseballBall.style.bottom = "250px";
+
+      goalie.style.left = "50%";
+      state.goalieX = 50;
+      state.goalieDirection = 1;
+    }
+
+    function finishAttempt(scored, text) {
+      state.animating = false;
+      if (scored) {
+        state.score++;
+        if (state.score > state.bests[state.sport]) {
+          state.bests[state.sport] = state.score;
+        }
+      }
+
+      scoreDisplay.textContent = state.score;
+      bestDisplay.textContent = state.bests[state.sport];
+      attemptsDisplay.textContent = `${state.attempts} / 10`;
+      messageDisplay.textContent = text;
+
+      setTimeout(() => {
+        resetObjects();
+        if (state.attempts >= 10) {
+          startBtn.disabled = true;
+          actionBtn.disabled = true;
+          messageDisplay.textContent = `Finished ${modeLabel.textContent}. Final score: ${state.score}/10`;
+        }
+      }, 750);
+    }
+
+    function basketballPlay() {
+      const accuracy = accuracyFromCenter();
+      let endX, endY, outcomeText, made = false;
+
+      if (accuracy <= 7) {
+        made = true;
+        endX = 645;
+        endY = 300;
+        basketballNet.animate(
+          [{ transform: "translateY(0) scaleY(1)" }, { transform: "translateY(8px) scaleY(1.12)" }, { transform: "translateY(0) scaleY(1)" }],
+          { duration: 260, easing: "ease-out" }
+        );
+        outcomeText = "Swish! Perfect release.";
+      } else if (accuracy <= 14) {
+        endX = state.meterValue < 50 ? 620 : 670;
+        endY = 305;
+        outcomeText = "Rimmed out. So close.";
+      } else if (accuracy <= 24) {
+        endX = state.meterValue < 50 ? 585 : 710;
+        endY = 275;
+        outcomeText = "Missed. Decent look.";
+      } else {
+        endX = state.meterValue < 50 ? 510 : 770;
+        endY = 245;
+        outcomeText = "Way off. Time it better.";
+      }
+
+      animateArc(basketballBall, 182, 145, endX, endY, 220, 900, () => finishAttempt(made, outcomeText));
+    }
+
+    function footballPlay() {
+      const accuracy = accuracyFromCenter();
+      let endX, endY, made = false, text = "";
+
+      if (accuracy <= 8) {
+        made = true;
+        endX = 472;
+        endY = 380;
+        text = "Right down the middle!";
+      } else if (accuracy <= 16) {
+        made = true;
+        endX = state.meterValue < 50 ? 425 : 520;
+        endY = 365;
+        text = "It sneaks inside the upright!";
+      } else if (accuracy <= 26) {
+        endX = state.meterValue < 50 ? 360 : 590;
+        endY = 345;
+        text = "Just wide. No good.";
+      } else {
+        endX = state.meterValue < 50 ? 290 : 680;
+        endY = 300;
+        text = "Hooked badly. Missed it.";
+      }
+
+      animateArc(footballBall, 470, 105, endX, endY, 260, 1000, () => finishAttempt(made, text));
+    }
+
+    function soccerPlay() {
+      stopGoalie();
+      const accuracy = accuracyFromCenter();
+      const goaliePercent = state.goalieX;
+      let shotLane, goalieLane, made = false, text = "";
+
+      if (state.meterValue < 33) shotLane = "left";
+      else if (state.meterValue > 67) shotLane = "right";
+      else shotLane = "center";
+
+      if (goaliePercent < 45) goalieLane = "left";
+      else if (goaliePercent > 55) goalieLane = "right";
+      else goalieLane = "center";
+
+      let endX = 480, endY = 320;
+
+      if (shotLane === "left") endX = 390;
+      if (shotLane === "center") endX = 480;
+      if (shotLane === "right") endX = 570;
+
+      if (accuracy <= 10 && shotLane !== goalieLane) {
+        made = true;
+        endY = 330;
+        text = "Goal! Picked the perfect corner.";
+      } else if (accuracy <= 18 && shotLane !== goalieLane) {
+        made = true;
+        endY = 290;
+        text = "Goal! Just out of the keeper’s reach.";
+      } else if (shotLane === goalieLane) {
+        endY = 260;
+        text = "Saved by the keeper!";
+      } else if (accuracy <= 28) {
+        endY = 245;
+        text = "Missed the placement. Off target.";
+      } else {
+        endY = 210;
+        text = "Skied it over the bar.";
+      }
+
+      animateArc(soccerBall, 482, 100, endX, endY, 90, 800, () => finishAttempt(made, text));
+    }
+
+    function baseballPlay() {
+      const accuracy = accuracyFromCenter();
+      let endX, endY, peak, duration, made = false, text = "";
+
+      if (accuracy <= 6) {
+        made = true;
+        endX = 730;
+        endY = 420;
+        peak = 260;
+        duration = 950;
+        text = "Home run! Crushed it.";
+      } else if (accuracy <= 14) {
+        made = true;
+        endX = 650;
+        endY = 360;
+        peak = 210;
+        duration = 900;
+        text = "Deep fly ball... gone!";
+      } else if (accuracy <= 24) {
+        endX = 580;
+        endY = 275;
+        peak = 140;
+        duration = 820;
+        text = "Solid contact, but not enough carry.";
+      } else if (accuracy <= 34) {
+        endX = 530;
+        endY = 215;
+        peak = 90;
+        duration = 760;
+        text = "Weak contact. Easy out.";
+      } else {
+        endX = 505;
+        endY = 170;
+        peak = 40;
+        duration = 680;
+        text = "Swing and miss.";
+      }
+
+      animateArc(baseballBall, 480, 250, endX, endY, peak, duration, () => finishAttempt(made, text));
+    }
+
+    function takeAction() {
+      if (!state.meterRunning || state.animating || state.attempts >= 10) return;
+
+      stopMeter();
+      state.animating = true;
+      state.attempts++;
+
+      if (state.sport === "basketball") basketballPlay();
+      if (state.sport === "football") footballPlay();
+      if (state.sport === "soccer") soccerPlay();
+      if (state.sport === "baseball") baseballPlay();
+    }
+
+    function resetMode() {
+      stopMeter();
+      stopGoalie();
+      state.score = 0;
+      state.attempts = 0;
+      state.meterValue = 0;
+      state.meterDirection = 1;
+      state.animating = false;
+      meterMarker.style.left = "0%";
+      startBtn.disabled = false;
+      actionBtn.disabled = true;
+      resetObjects();
+      updateHUD();
+    }
+
+    function switchSport(sport) {
+      state.sport = sport;
+      resetMode();
+      showScene();
+      updateActiveButtons();
+      updateHUD();
+    }
+
+    function switchDifficulty(difficulty) {
+      state.difficulty = difficulty;
+      updateTargetZone();
+      updateActiveButtons();
+      messageDisplay.textContent = `Difficulty set to ${difficulty}.`;
+    }
+
+    sportButtons.forEach(btn => {
+      btn.addEventListener("click", () => switchSport(btn.dataset.sport));
+    });
+
+    difficultyButtons.forEach(btn => {
+      btn.addEventListener("click", () => switchDifficulty(btn.dataset.difficulty));
+    });
+
+    startBtn.addEventListener("click", startMeter);
+    actionBtn.addEventListener("click", takeAction);
+    resetBtn.addEventListener("click", resetMode);
+
+    updateTargetZone();
+    updateActiveButtons();
+    showScene();
+    resetObjects();
+    updateHUD();
+  </script>
+</body>
+</html>

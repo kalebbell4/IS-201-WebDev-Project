@@ -1,0 +1,182 @@
+body {
+    margin: 0;
+    background-color: #f5f7fb;
+    color: #1f2937;
+    font-family: Arial, Helvetica, sans-serif;
+    line-height: 1.7;
+}
+
+.topbar {
+    background-color: #111827;
+    padding: 16px 0;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.topbar-inner {
+    width: 92%;
+    max-width: 1150px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.topbar a {
+    color: white;
+    text-decoration: none;
+    margin: 0 12px;
+    font-weight: 700;
+    font-size: 15px;
+}
+
+.topbar a:hover {
+    color: #d4af37;
+}
+
+.hero {
+    background-image: linear-gradient(rgba(17, 24, 39, 0.70), rgba(17, 24, 39, 0.70)), url("../assets/img/movie-bg.jpg");
+    background-size: cover;
+    background-position: center;
+    padding: 120px 20px;
+    text-align: center;
+}
+
+.hero-overlay {
+    max-width: 850px;
+    margin: 0 auto;
+    color: white;
+}
+
+.hero h1 {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 56px;
+    margin-bottom: 14px;
+}
+
+.hero p {
+    font-size: 18px;
+    max-width: 760px;
+    margin: 0 auto;
+}
+
+.main-content {
+    width: 92%;
+    max-width: 1150px;
+    margin: 42px auto;
+}
+
+.section-card {
+    background-color: white;
+    padding: 34px;
+    margin-bottom: 28px;
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+.section-card h2 {
+    color: #111827;
+    font-family: Georgia, "Times New Roman", serif;
+    margin-top: 0;
+    margin-bottom: 12px;
+}
+
+.section-card h3 {
+    color: #8b5e00;
+    font-family: Georgia, "Times New Roman", serif;
+    margin-top: 24px;
+}
+
+.custom-list li {
+    margin-bottom: 10px;
+}
+
+.movie-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 24px;
+    margin-bottom: 28px;
+}
+
+.movie-card {
+    background-color: white;
+    padding: 24px;
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+.movie-card h2 {
+    color: #111827;
+    font-family: Georgia, "Times New Roman", serif;
+    margin-top: 18px;
+    margin-bottom: 10px;
+}
+
+.movie-poster {
+    display: block;
+    width: 100%;
+    height: 380px;
+    object-fit: cover;
+    border-radius: 12px;
+}
+
+.media-frame {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.media-frame iframe {
+    width: 100%;
+    max-width: 960px;
+    min-height: 520px;
+    border: none;
+    border-radius: 12px;
+}
+
+.tall-frame iframe {
+    min-height: 760px;
+}
+
+.closing-card {
+    text-align: center;
+}
+
+.back-top {
+    display: inline-block;
+    margin-top: 14px;
+    color: #111827;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.back-top:hover {
+    text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+    .hero h1 {
+        font-size: 40px;
+    }
+
+    .topbar a {
+        display: inline-block;
+        margin: 6px 8px;
+    }
+
+    .section-card,
+    .movie-card {
+        padding: 22px;
+    }
+
+    .movie-poster {
+        height: 320px;
+    }
+
+    .media-frame iframe {
+        min-height: 360px;
+    }
+
+    .tall-frame iframe {
+        min-height: 520px;
+    }
+}
